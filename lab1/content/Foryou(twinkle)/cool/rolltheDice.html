@@ -1,0 +1,515 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Dice Master - Roll & Win</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+    
+    body {
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      min-height: 100vh;
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      color: white;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding: 20px;
+      overflow-x: hidden;
+    }
+    
+    h1 {
+      font-size: 3.5rem;
+      text-shadow: 3px 3px 10px rgba(0,0,0,0.3);
+      margin: 20px 0;
+      animation: glow 2s ease-in-out infinite alternate;
+    }
+    
+    @keyframes glow {
+      from { text-shadow: 3px 3px 10px rgba(0,0,0,0.3); }
+      to { text-shadow: 3px 3px 20px rgba(255,255,255,0.5), 0 0 30px rgba(255,255,255,0.3); }
+    }
+    
+    .game-mode-selector {
+      background: rgba(255,255,255,0.1);
+      backdrop-filter: blur(10px);
+      border-radius: 15px;
+      padding: 20px;
+      margin-bottom: 30px;
+      display: flex;
+      gap: 15px;
+      flex-wrap: wrap;
+      justify-content: center;
+    }
+    
+    .mode-btn {
+      background: rgba(255,255,255,0.2);
+      border: 2px solid rgba(255,255,255,0.3);
+      border-radius: 10px;
+      padding: 12px 25px;
+      font-size: 1rem;
+      color: white;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      font-weight: 600;
+    }
+    
+    .mode-btn:hover {
+      background: rgba(255,255,255,0.3);
+      transform: translateY(-2px);
+    }
+    
+    .mode-btn.active {
+      background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+      border-color: white;
+      box-shadow: 0 5px 20px rgba(245, 87, 108, 0.4);
+    }
+    
+    .game-container {
+      background: rgba(255,255,255,0.1);
+      backdrop-filter: blur(10px);
+      border-radius: 20px;
+      padding: 40px;
+      box-shadow: 0 10px 40px rgba(0,0,0,0.3);
+      max-width: 600px;
+      width: 100%;
+    }
+    
+    .score-board {
+      display: flex;
+      justify-content: space-around;
+      margin-bottom: 30px;
+      gap: 20px;
+    }
+    
+    .score-item {
+      text-align: center;
+      background: rgba(255,255,255,0.1);
+      padding: 15px 25px;
+      border-radius: 12px;
+      flex: 1;
+    }
+    
+    .score-label {
+      font-size: 0.9rem;
+      opacity: 0.8;
+      margin-bottom: 5px;
+    }
+    
+    .score-value {
+      font-size: 2rem;
+      font-weight: bold;
+    }
+    
+    .dice-container {
+      text-align: center;
+      margin: 40px 0;
+      position: relative;
+    }
+    
+    .dice {
+      width: 120px;
+      height: 120px;
+      margin: 0 auto;
+      perspective: 1000px;
+      cursor: pointer;
+    }
+    
+    .dice-inner {
+      width: 100%;
+      height: 100%;
+      position: relative;
+      transform-style: preserve-3d;
+      transition: transform 0.6s;
+    }
+    
+    .dice.rolling .dice-inner {
+      animation: roll 0.6s ease-out;
+    }
+    
+    @keyframes roll {
+      0% { transform: rotateX(0deg) rotateY(0deg); }
+      100% { transform: rotateX(720deg) rotateY(720deg); }
+    }
+    
+    .dice-face {
+      position: absolute;
+      width: 120px;
+      height: 120px;
+      background: white;
+      border-radius: 15px;
+      box-shadow: 0 5px 20px rgba(0,0,0,0.2);
+      display: flex;
+      flex-wrap: wrap;
+      padding: 15px;
+      justify-content: space-around;
+      align-content: space-around;
+    }
+    
+    .dot {
+      width: 20px;
+      height: 20px;
+      background: #667eea;
+      border-radius: 50%;
+      box-shadow: inset 0 2px 5px rgba(0,0,0,0.2);
+    }
+    
+    .controls {
+      text-align: center;
+      margin-top: 30px;
+    }
+    
+    .roll-btn {
+      background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+      border: none;
+      border-radius: 50px;
+      padding: 18px 50px;
+      font-size: 1.4rem;
+      color: white;
+      cursor: pointer;
+      box-shadow: 0 8px 25px rgba(245, 87, 108, 0.4);
+      transition: all 0.3s ease;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+    }
+    
+    .roll-btn:hover:not(:disabled) {
+      transform: translateY(-3px);
+      box-shadow: 0 12px 35px rgba(245, 87, 108, 0.6);
+    }
+    
+    .roll-btn:disabled {
+      opacity: 0.5;
+      cursor: not-allowed;
+    }
+    
+    .result-message {
+      margin-top: 25px;
+      font-size: 1.5rem;
+      font-weight: bold;
+      min-height: 2rem;
+      animation: fadeIn 0.5s ease;
+    }
+    
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(-10px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+    
+    .game-info {
+      text-align: center;
+      margin-top: 20px;
+      padding: 15px;
+      background: rgba(255,255,255,0.1);
+      border-radius: 10px;
+      font-size: 0.95rem;
+      line-height: 1.6;
+    }
+    
+    .reset-btn {
+      background: rgba(255,255,255,0.2);
+      border: 2px solid white;
+      border-radius: 25px;
+      padding: 10px 30px;
+      font-size: 1rem;
+      color: white;
+      cursor: pointer;
+      margin-top: 20px;
+      transition: all 0.3s ease;
+      font-weight: 600;
+    }
+    
+    .reset-btn:hover {
+      background: rgba(255,255,255,0.3);
+      transform: scale(1.05);
+    }
+    
+    .streak-indicator {
+      position: absolute;
+      top: -30px;
+      left: 50%;
+      transform: translateX(-50%);
+      background: linear-gradient(135deg, #ffd89b 0%, #19547b 100%);
+      padding: 8px 20px;
+      border-radius: 20px;
+      font-size: 0.9rem;
+      font-weight: bold;
+      animation: bounce 0.5s ease;
+      box-shadow: 0 5px 15px rgba(255, 216, 155, 0.5);
+    }
+    
+    @keyframes bounce {
+      0%, 100% { transform: translateX(-50%) translateY(0); }
+      50% { transform: translateX(-50%) translateY(-10px); }
+    }
+    
+    .celebration {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      pointer-events: none;
+      z-index: 1000;
+    }
+    
+    .confetti {
+      position: absolute;
+      width: 10px;
+      height: 10px;
+      background: #f5576c;
+      animation: confetti-fall 3s ease-out forwards;
+    }
+    
+    @keyframes confetti-fall {
+      0% { 
+        transform: translateY(0) rotateZ(0deg);
+        opacity: 1;
+      }
+      100% { 
+        transform: translateY(100vh) rotateZ(720deg);
+        opacity: 0;
+      }
+    }
+    
+    @media (max-width: 600px) {
+      h1 { font-size: 2.5rem; }
+      .game-container { padding: 25px; }
+      .dice { width: 100px; height: 100px; }
+      .dice-face { width: 100px; height: 100px; }
+      .roll-btn { padding: 15px 40px; font-size: 1.2rem; }
+    }
+  </style>
+</head>
+<body>
+  <h1>🎲 Dice Master</h1>
+  
+  <div class="game-mode-selector">
+    <button class="mode-btn active" onclick="setGameMode('free')">Free Play</button>
+    <button class="mode-btn" onclick="setGameMode('race50')">Race to 50</button>
+    <button class="mode-btn" onclick="setGameMode('highscore')">High Score (10 rolls)</button>
+  </div>
+  
+  <div class="game-container">
+    <div class="score-board">
+      <div class="score-item">
+        <div class="score-label">Total Score</div>
+        <div class="score-value" id="totalScore">0</div>
+      </div>
+      <div class="score-item">
+        <div class="score-label">Rolls</div>
+        <div class="score-value" id="rollCount">0</div>
+      </div>
+      <div class="score-item">
+        <div class="score-label">Best Roll</div>
+        <div class="score-value" id="bestRoll">-</div>
+      </div>
+    </div>
+    
+    <div class="dice-container">
+      <div class="dice" id="dice">
+        <div class="dice-inner" id="diceInner">
+          <div class="dice-face" id="diceFace"></div>
+        </div>
+      </div>
+    </div>
+    
+    <div class="controls">
+      <button class="roll-btn" id="rollBtn" onclick="rollDice()">Roll Dice</button>
+      <div class="result-message" id="resultMessage"></div>
+      <button class="reset-btn" onclick="resetGame()">Reset Game</button>
+    </div>
+    
+    <div class="game-info" id="gameInfo">
+      Roll the dice and watch your score grow! Try different game modes for new challenges.
+    </div>
+  </div>
+  
+  <div class="celebration" id="celebration"></div>
+
+  <script>
+    let gameState = {
+      mode: 'free',
+      totalScore: 0,
+      rollCount: 0,
+      bestRoll: null,
+      lastRoll: null,
+      streak: 0,
+      rollsRemaining: null
+    };
+    
+    const gameInfoText = {
+      free: 'Roll the dice and watch your score grow! Try different game modes for new challenges.',
+      race50: 'First to reach 50 points wins! How many rolls will it take you?',
+      highscore: 'You have 10 rolls to get the highest score possible. Make them count!'
+    };
+    
+    function setGameMode(mode) {
+      document.querySelectorAll('.mode-btn').forEach(btn => btn.classList.remove('active'));
+      event.target.classList.add('active');
+      gameState.mode = mode;
+      resetGame();
+    }
+    
+    function createDiceFace(number) {
+      const face = document.getElementById('diceFace');
+      face.innerHTML = '';
+      
+      const positions = {
+        1: [[50, 50]],
+        2: [[25, 25], [75, 75]],
+        3: [[25, 25], [50, 50], [75, 75]],
+        4: [[25, 25], [75, 25], [25, 75], [75, 75]],
+        5: [[25, 25], [75, 25], [50, 50], [25, 75], [75, 75]],
+        6: [[25, 25], [75, 25], [25, 50], [75, 50], [25, 75], [75, 75]]
+      };
+      
+      positions[number].forEach(([top, left]) => {
+        const dot = document.createElement('div');
+        dot.className = 'dot';
+        dot.style.position = 'absolute';
+        dot.style.top = `${top}%`;
+        dot.style.left = `${left}%`;
+        dot.style.transform = 'translate(-50%, -50%)';
+        face.appendChild(dot);
+      });
+    }
+    
+    function rollDice() {
+      const dice = document.getElementById('dice');
+      const rollBtn = document.getElementById('rollBtn');
+      
+      rollBtn.disabled = true;
+      dice.classList.add('rolling');
+      
+      setTimeout(() => {
+        const randomNumber = Math.floor(Math.random() * 6) + 1;
+        createDiceFace(randomNumber);
+        dice.classList.remove('rolling');
+        rollBtn.disabled = false;
+        
+        updateGame(randomNumber);
+      }, 600);
+    }
+    
+    function updateGame(roll) {
+      gameState.rollCount++;
+      gameState.totalScore += roll;
+      
+      if (gameState.bestRoll === null || roll > gameState.bestRoll) {
+        gameState.bestRoll = roll;
+      }
+      
+      if (gameState.lastRoll === roll) {
+        gameState.streak++;
+      } else {
+        gameState.streak = 1;
+      }
+      gameState.lastRoll = roll;
+      
+      document.getElementById('totalScore').textContent = gameState.totalScore;
+      document.getElementById('rollCount').textContent = gameState.rollCount;
+      document.getElementById('bestRoll').textContent = gameState.bestRoll;
+      
+      let message = `You rolled a ${roll}!`;
+      
+      if (gameState.streak >= 2) {
+        message += ` 🔥 ${gameState.streak}x streak!`;
+        showStreakIndicator(gameState.streak);
+      }
+      
+      if (roll === 6) {
+        message += ' 🌟 Perfect!';
+      }
+      
+      document.getElementById('resultMessage').textContent = message;
+      
+      checkGameEnd();
+    }
+    
+    function showStreakIndicator(streak) {
+      const container = document.querySelector('.dice-container');
+      const existing = container.querySelector('.streak-indicator');
+      if (existing) existing.remove();
+      
+      const indicator = document.createElement('div');
+      indicator.className = 'streak-indicator';
+      indicator.textContent = `${streak}x STREAK! 🔥`;
+      container.appendChild(indicator);
+      
+      setTimeout(() => indicator.remove(), 2000);
+    }
+    
+    function checkGameEnd() {
+      let gameEnded = false;
+      let message = '';
+      
+      if (gameState.mode === 'race50' && gameState.totalScore >= 50) {
+        gameEnded = true;
+        message = `🎉 You won in ${gameState.rollCount} rolls! Final score: ${gameState.totalScore}`;
+        celebrate();
+      } else if (gameState.mode === 'highscore') {
+        if (gameState.rollCount >= 10) {
+          gameEnded = true;
+          message = `🏆 Game Over! Final score: ${gameState.totalScore}`;
+          celebrate();
+        } else {
+          document.getElementById('gameInfo').textContent = `Rolls remaining: ${10 - gameState.rollCount}`;
+        }
+      }
+      
+      if (gameEnded) {
+        document.getElementById('gameInfo').textContent = message;
+        document.getElementById('rollBtn').disabled = true;
+      }
+    }
+    
+    function celebrate() {
+      const celebration = document.getElementById('celebration');
+      const colors = ['#f093fb', '#f5576c', '#4facfe', '#00f2fe', '#ffd89b'];
+      
+      for (let i = 0; i < 50; i++) {
+        setTimeout(() => {
+          const confetti = document.createElement('div');
+          confetti.className = 'confetti';
+          confetti.style.left = Math.random() * 100 + '%';
+          confetti.style.background = colors[Math.floor(Math.random() * colors.length)];
+          confetti.style.animationDelay = Math.random() * 0.5 + 's';
+          celebration.appendChild(confetti);
+          
+          setTimeout(() => confetti.remove(), 3000);
+        }, i * 30);
+      }
+    }
+    
+    function resetGame() {
+      gameState = {
+        mode: gameState.mode,
+        totalScore: 0,
+        rollCount: 0,
+        bestRoll: null,
+        lastRoll: null,
+        streak: 0,
+        rollsRemaining: null
+      };
+      
+      document.getElementById('totalScore').textContent = '0';
+      document.getElementById('rollCount').textContent = '0';
+      document.getElementById('bestRoll').textContent = '-';
+      document.getElementById('resultMessage').textContent = '';
+      document.getElementById('gameInfo').textContent = gameInfoText[gameState.mode];
+      document.getElementById('rollBtn').disabled = false;
+      
+      createDiceFace(6);
+    }
+    
+    createDiceFace(6);
+  </script>
+</body>
+</html>
