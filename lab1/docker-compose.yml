@@ -1,4 +1,4 @@
-version: "3.8"
+
 services:
   server:
     build:
@@ -7,13 +7,13 @@ services:
     ports:
       - "1337:1337"
     volumes:
-      - "./content:/app/content:ro"
+      - "./content:/app/content:ro,Z"
   client:
     build:
       context: ./client
       dockerfile: dockerfile
     volumes:
-      - "./content/downloads:/app/content/downloads"
+      - "./content/downloads:/app/content/downloads:Z"
     extra_hosts:
       - "host.docker.internal:host-gateway"
     command: ["tail","-f","/dev/null"]
