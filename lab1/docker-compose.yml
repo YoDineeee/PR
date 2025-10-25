@@ -1,5 +1,19 @@
+version: "3.8"
 services:
   server:
-    
+    build:
+      context: ./server
+      dockerfile: dockerfile
+    ports:
+      - "1337:1337"
+    volumes:
+      - "./content:/app/content:ro"
   client:
-   
+    build:
+      context: ./client
+      dockerfile: dockerfile
+    volumes:
+      - "./content/downloads:/app/content/downloads"
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+    command: ["tail","-f","/dev/null"]
