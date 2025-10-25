@@ -92,7 +92,7 @@ th{{background:#f3f4f6}}</style></head>
 </body></html>"""
     return html.encode()
 
-# ---------- Server ----------
+
 class HTTPServer:
     def __init__(self, host: str, port: int, docroot: Path, mode: str, rate: float, burst: int, race_mode: bool):
         self.host, self.port, self.docroot = host, port, docroot.resolve()

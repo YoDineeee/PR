@@ -1,0 +1,327 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>FIFA Pack Opener</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Arial', sans-serif;
+            background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            overflow-x: hidden;
+        }
+
+        .container {
+            text-align: center;
+            padding: 20px;
+        }
+
+        h1 {
+            color: white;
+            font-size: 3em;
+            margin-bottom: 30px;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.5);
+        }
+
+        .pack {
+            width: 300px;
+            height: 400px;
+            margin: 0 auto;
+            position: relative;
+            cursor: pointer;
+            transition: transform 0.3s;
+        }
+
+        .pack:hover {
+            transform: scale(1.05);
+        }
+
+        .pack-image {
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(145deg, #FFD700, #FFA500);
+            border-radius: 20px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.5);
+            border: 3px solid #FFD700;
+        }
+
+        .pack-image h2 {
+            color: #1e3c72;
+            font-size: 2.5em;
+            margin-bottom: 20px;
+        }
+
+        .pack-image p {
+            color: #1e3c72;
+            font-size: 1.2em;
+            font-weight: bold;
+        }
+
+        .cards-container {
+            display: none;
+            perspective: 1000px;
+            margin-top: 50px;
+        }
+
+        .cards-container.active {
+            display: flex;
+            gap: 20px;
+            flex-wrap: wrap;
+            justify-content: center;
+            animation: cardsReveal 0.8s ease-out;
+        }
+
+        @keyframes cardsReveal {
+            from {
+                opacity: 0;
+                transform: translateY(50px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .card {
+            width: 200px;
+            height: 300px;
+            position: relative;
+            transform-style: preserve-3d;
+            transition: transform 0.6s;
+            cursor: pointer;
+            animation: cardFlip 0.8s ease-out forwards;
+        }
+
+        @keyframes cardFlip {
+            0% {
+                transform: rotateY(180deg) scale(0.8);
+                opacity: 0;
+            }
+            100% {
+                transform: rotateY(0deg) scale(1);
+                opacity: 1;
+            }
+        }
+
+        .card.flipped {
+            animation: none;
+        }
+
+        .card-face {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            backface-visibility: hidden;
+            border-radius: 15px;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            padding: 20px;
+            box-shadow: 0 5px 20px rgba(0,0,0,0.3);
+        }
+
+        .card-front {
+            background: linear-gradient(145deg, #2c3e50, #34495e);
+            color: white;
+        }
+
+        .card-back {
+            background: linear-gradient(145deg, #FFD700, #FFA500);
+            transform: rotateY(180deg);
+        }
+
+        .card.bronze .card-front { background: linear-gradient(145deg, #CD7F32, #8B4513); }
+        .card.silver .card-front { background: linear-gradient(145deg, #C0C0C0, #A9A9A9); }
+        .card.gold .card-front { background: linear-gradient(145deg, #FFD700, #FFA500); }
+
+        .rating {
+            font-size: 3em;
+            font-weight: bold;
+            text-align: left;
+        }
+
+        .position {
+            font-size: 1.2em;
+            margin-top: -10px;
+            text-align: left;
+        }
+
+        .player-name {
+            font-size: 1.5em;
+            font-weight: bold;
+            text-align: center;
+            margin-top: 80px;
+        }
+
+        .stats {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 10px;
+            font-size: 0.9em;
+        }
+
+        .stat {
+            display: flex;
+            justify-content: space-between;
+        }
+
+        .open-button {
+            background: linear-gradient(145deg, #FFD700, #FFA500);
+            color: #1e3c72;
+            border: none;
+            padding: 20px 40px;
+            font-size: 1.5em;
+            font-weight: bold;
+            border-radius: 10px;
+            cursor: pointer;
+            margin-top: 30px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.3);
+            transition: all 0.3s;
+        }
+
+        .open-button:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 20px rgba(0,0,0,0.4);
+        }
+
+        .open-button:active {
+            transform: translateY(0);
+        }
+
+        .reset-button {
+            background: #e74c3c;
+            color: white;
+            border: none;
+            padding: 15px 30px;
+            font-size: 1.2em;
+            font-weight: bold;
+            border-radius: 10px;
+            cursor: pointer;
+            margin-top: 20px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.3);
+            transition: all 0.3s;
+        }
+
+        .reset-button:hover {
+            background: #c0392b;
+            transform: translateY(-2px);
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>FIFA PACK OPENER</h1>
+        
+        <div class="pack" id="pack">
+            <div class="pack-image">
+                <h2>GOLD PACK</h2>
+                <p>5 RARE PLAYERS</p>
+                <p style="margin-top: 10px;">✨ CLICK TO OPEN ✨</p>
+            </div>
+        </div>
+
+        <div class="cards-container" id="cardsContainer"></div>
+        
+        <button class="reset-button" id="resetBtn" style="display: none;">Open Another Pack</button>
+    </div>
+
+    <script>
+        const players = [
+            { name: "MESSI", rating: 93, position: "RW", pace: 85, shooting: 92, passing: 91, dribbling: 95, defending: 38, physical: 65, rarity: "gold" },
+            { name: "RONALDO", rating: 91, position: "ST", pace: 87, shooting: 93, passing: 82, dribbling: 88, defending: 35, physical: 77, rarity: "gold" },
+            { name: "NEYMAR", rating: 89, position: "LW", pace: 91, shooting: 83, passing: 86, dribbling: 94, defending: 37, physical: 61, rarity: "gold" },
+            { name: "DE BRUYNE", rating: 91, position: "CM", pace: 76, shooting: 86, passing: 93, dribbling: 88, defending: 64, physical: 78, rarity: "gold" },
+            { name: "LEWANDOWSKI", rating: 91, position: "ST", pace: 78, shooting: 92, passing: 79, dribbling: 86, defending: 44, physical: 82, rarity: "gold" },
+            { name: "MBAPPE", rating: 91, position: "ST", pace: 97, shooting: 88, passing: 80, dribbling: 92, defending: 39, physical: 77, rarity: "gold" },
+            { name: "MODRIC", rating: 88, position: "CM", pace: 74, shooting: 76, passing: 89, dribbling: 90, defending: 72, physical: 68, rarity: "gold" },
+            { name: "BENZEMA", rating: 89, position: "CF", pace: 77, shooting: 88, passing: 83, dribbling: 88, defending: 40, physical: 78, rarity: "gold" },
+            { name: "VAN DIJK", rating: 90, position: "CB", pace: 75, shooting: 60, passing: 71, dribbling: 72, defending: 91, physical: 86, rarity: "gold" },
+            { name: "COURTOIS", rating: 89, position: "GK", pace: 45, shooting: 50, passing: 75, dribbling: 68, defending: 89, physical: 87, rarity: "gold" },
+            { name: "SALAH", rating: 89, position: "RW", pace: 90, shooting: 87, passing: 81, dribbling: 90, defending: 45, physical: 75, rarity: "gold" },
+            { name: "KANE", rating: 88, position: "ST", pace: 68, shooting: 91, passing: 83, dribbling: 82, defending: 47, physical: 83, rarity: "gold" },
+            { name: "RAMOS", rating: 87, position: "CB", pace: 62, shooting: 64, passing: 72, dribbling: 71, defending: 87, physical: 82, rarity: "silver" },
+            { name: "MÜLLER", rating: 87, position: "CAM", pace: 72, shooting: 82, passing: 84, dribbling: 82, defending: 58, physical: 71, rarity: "silver" },
+            { name: "KROOS", rating: 88, position: "CM", pace: 54, shooting: 81, passing: 91, dribbling: 81, defending: 71, physical: 68, rarity: "silver" },
+            { name: "CASEMIRO", rating: 87, position: "CDM", pace: 62, shooting: 72, passing: 75, dribbling: 72, defending: 87, physical: 90, rarity: "silver" },
+            { name: "KANTE", rating: 89, position: "CDM", pace: 77, shooting: 66, passing: 75, dribbling: 82, defending: 88, physical: 82, rarity: "silver" },
+            { name: "ALISSON", rating: 89, position: "GK", pace: 46, shooting: 52, passing: 76, dribbling: 70, defending: 88, physical: 86, rarity: "silver" },
+            { name: "HERNANDEZ", rating: 78, position: "CB", pace: 71, shooting: 52, passing: 64, dribbling: 68, defending: 79, physical: 77, rarity: "bronze" },
+            { name: "FERNANDES", rating: 76, position: "CM", pace: 69, shooting: 74, passing: 76, dribbling: 75, defending: 65, physical: 72, rarity: "bronze" }
+        ];
+
+        const pack = document.getElementById('pack');
+        const cardsContainer = document.getElementById('cardsContainer');
+        const resetBtn = document.getElementById('resetBtn');
+
+        function getRandomPlayers(count) {
+            const shuffled = [...players].sort(() => 0.5 - Math.random());
+            return shuffled.slice(0, count);
+        }
+
+        function createCard(player, index) {
+            const card = document.createElement('div');
+            card.className = `card ${player.rarity}`;
+            card.style.animationDelay = `${index * 0.1}s`;
+            
+            card.innerHTML = `
+                <div class="card-face card-back"></div>
+                <div class="card-face card-front">
+                    <div>
+                        <div class="rating">${player.rating}</div>
+                        <div class="position">${player.position}</div>
+                    </div>
+                    <div class="player-name">${player.name}</div>
+                    <div class="stats">
+                        <div class="stat"><span>PAC</span><span>${player.pace}</span></div>
+                        <div class="stat"><span>SHO</span><span>${player.shooting}</span></div>
+                        <div class="stat"><span>PAS</span><span>${player.passing}</span></div>
+                        <div class="stat"><span>DRI</span><span>${player.dribbling}</span></div>
+                        <div class="stat"><span>DEF</span><span>${player.defending}</span></div>
+                        <div class="stat"><span>PHY</span><span>${player.physical}</span></div>
+                    </div>
+                </div>
+            `;
+            
+            return card;
+        }
+
+        function openPack() {
+            pack.style.display = 'none';
+            cardsContainer.innerHTML = '';
+            cardsContainer.classList.add('active');
+            
+            const selectedPlayers = getRandomPlayers(5);
+            selectedPlayers.forEach((player, index) => {
+                const card = createCard(player, index);
+                cardsContainer.appendChild(card);
+            });
+            
+            resetBtn.style.display = 'block';
+        }
+
+        function resetPack() {
+            cardsContainer.classList.remove('active');
+            cardsContainer.innerHTML = '';
+            pack.style.display = 'block';
+            resetBtn.style.display = 'none';
+        }
+
+        pack.addEventListener('click', openPack);
+        resetBtn.addEventListener('click', resetPack);
+    </script>
+</body>
+</html>

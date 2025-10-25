@@ -1,0 +1,31 @@
+.PHONY: build up down logs test-single test-threaded test-pool race-bug race-fix rate
+
+build:
+	docker compose build
+
+up:
+	docker compose up -d server
+
+down:
+	docker compose down
+
+logs:
+	docker compose logs -f server
+
+test-single:
+	docker compose run --rm -p 8088:8088 server python server.py --mode single --delay 1.0
+
+test-threaded:
+	docker compose run --rm -p 8088:8088 server python server.py --mode threaded --delay 1.0
+
+test-pool:
+	docker compose run --rm -p 8088:8088 server python server.py --mode pool --workers 8 --delay 1.0
+
+race-bug:
+	docker compose run --rm -p 8088:8088 server python server.py --mode pool --workers 16 --race --delay 0.0
+
+race-fix:
+	docker compose run --rm -p 8088:8088 server python server.py --mode pool --workers 16 --delay 0.0
+
+rate:
+	docker compose run --rm -p 8088:8088 server python server.py --mode pool --rate 5 --burst 5 --delay 0.2
