@@ -1,0 +1,9 @@
+FROM python:3.11-slim
+
+WORKDIR /app
+
+COPY follower/ /app/follower/
+RUN pip install --no-cache-dir flask
+
+EXPOSE 5000
+CMD ["python", "-m", "follower.main"]
