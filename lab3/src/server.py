@@ -2,7 +2,7 @@
 from __future__ import annotations
 from flask import Flask, request, jsonify
 from typing import List
-from . import commands
+import commands
 
 app = Flask(__name__)
 

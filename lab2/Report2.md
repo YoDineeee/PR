@@ -107,4 +107,3 @@ docker compose run --rm -p 8088:8088 server \
 This project delivers a modern concurrent HTTP server with controlled thread usage, accurate synchronization, and per-client rate limiting.
 Performance improved tenfold compared to the single-threaded version, while maintaining fairness and stability under heavy load.
 The Dockerized setup ensures reproducibility, isolation, and straightforward testing across systems.
-

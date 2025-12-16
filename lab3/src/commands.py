@@ -2,7 +2,7 @@
 from __future__ import annotations
 from dataclasses import dataclass
 from typing import Dict, Optional, Tuple, List
-from .board import Board, Coord
+from board import Board, Coord
 
 @dataclass
 class GameState:

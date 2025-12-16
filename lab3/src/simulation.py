@@ -17,7 +17,7 @@ from typing import Dict, List, Optional, Tuple
 #   board.flip(player_id, row, col)  (blocking allowed)
 #   board.look(player_id) -> str
 #   board.__str__ or board.to_string() -> str
-from src.board import Board  # change if your module path differs
+from board import Board  # change if your module path differs
 
 
 Coord = Tuple[int, int]

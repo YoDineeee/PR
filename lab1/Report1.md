@@ -245,4 +245,3 @@ This confirms LAN accessibility and correct TCP socket handling.
 ## 9. Conclusion
 
 This laboratory successfully demonstrates an HTTP file server implemented using **Python TCP sockets**, containerized with Docker for consistent deployment.
-
